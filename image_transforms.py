@@ -1,6 +1,82 @@
 import cv2
 import dlib
 import numpy as np
+import pilgram
+import os
+import skimage.io
+import PIL.Image
+
+def apply_benign_transforms(image_filepaths, out_dir):
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+        
+    filters = [
+        ('aden', pilgram.aden),
+        ('brooklyn', pilgram.brooklyn),
+        ('clarendon', pilgram.clarendon),
+        ('toaster', pilgram.toaster),
+        ('nashville', pilgram.nashville),
+    ]
+
+    transformed_image_filepaths = {}
+    transformed_image_filepaths["None"] = image_filepaths
+    transform_list = ["None"]
+    for row in filters:
+        transformed_image_filepaths[row[0]] = []
+        transform_list.append(row[0])
+
+    jpeg_qualities = [75, 50]
+    for jpeg_quality in jpeg_qualities:
+        transformed_image_filepaths["JPEG-{}".format(jpeg_quality)] = []
+        transform_list.append("JPEG-{}".format(jpeg_quality))
+
+    for fp in image_filepaths:
+        original_filename = os.path.basename(fp)
+        image_np = skimage.io.imread(fp)
+        img = PIL.Image.fromarray(image_np)
+        for image_filter in filters:
+            filtered_image = image_filter[1](img)
+            filtered_filename = "{}_{}.png".format(original_filename, image_filter[0])
+            filtered_image.save(os.path.join(out_dir, filtered_filename))
+            transformed_image_filepaths[image_filter[0]].append(os.path.join(out_dir, filtered_filename))
+        
+        for quality in [50, 75]:
+            jpeg_key = "JPEG-{}".format(quality)
+            image_np = skimage.io.imread(fp)
+            image_np = np.uint8(image_np)
+            jpeg_path = os.path.join(out_dir, "{}_{}.jpeg".format(original_filename, jpeg_key))
+            PIL.Image.fromarray(image_np).save(jpeg_path,"JPEG", quality=quality)
+            transformed_image_filepaths[jpeg_key].append(jpeg_path)
+    
+    return transform_list, transformed_image_filepaths
+
+def apply_malicious_transforms(signed_image_paths, target_image_paths, out_dir):
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+        
+    transformed_image_filepaths = {
+        "face_swap" : []
+    }
+    for target_image_path in target_image_paths:
+        for signed_image_path in signed_image_paths:
+            
+            pic_a_name = target_image_path.split("/")[-1].split(".")[0]
+            pic_b_name = signed_image_path.split("/")[-1].split(".")[0]
+            
+            output_file_name_fs = "faseswap_{}_{}.jpg".format(pic_a_name, pic_b_name)
+            output_file_name_fs = os.path.join(out_dir, output_file_name_fs)
+            try:
+                swap_faces(target_image_path, signed_image_path, output_file_name_fs)
+            except:
+                print("Error in shallowfakes")
+
+            if os.path.exists(output_file_name_fs):
+                transformed_image_filepaths["face_swap"].append(output_file_name_fs)
+                print ("face swap success")
+    
+    assert len(transformed_image_filepaths['face_swap']) >= 1
+    
+    return ["face_swap"], transformed_image_filepaths
 
 def swap_faces(face_image_path, body_image_path, output_path):
     face = cv2.imread(face_image_path)
@@ -179,3 +255,4 @@ def swap_faces(face_image_path, body_image_path, output_path):
     seamlessclone = cv2.seamlessClone(result, body, body_head_mask, center_face2, cv2.NORMAL_CLONE)
 
     cv2.imwrite(output_path, seamlessclone)
+
