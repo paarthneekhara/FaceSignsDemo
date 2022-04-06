@@ -1,5 +1,5 @@
 # FaceSigns Demo
-[ [Google Colab Demo] ](https://colab.research.google.com/drive/1Qzqw0x_R5Xt62stvJCCQDqP8Qw_HAhIp?usp=sharing) [ [Project Webpage] ](https://shehzeen.github.io/facesigns/) [ [Paper] ](https://arxiv.org/abs/2204.01960)
+[ [Google Colab Demo] ](https://colab.research.google.com/drive/1Qzqw0x_R5Xt62stvJCCQDqP8Qw_HAhIp?usp=sharing) [[Project Webpage]](https://shehzeen.github.io/facesigns/) [[Paper]](https://arxiv.org/abs/2204.01960)
 
 Inference demo for our paper [FaceSigns: Semi-Fragile Neural Watermarks for Media Authentication and Countering Deepfakes
 ](https://arxiv.org/abs/2204.01960)
