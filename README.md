@@ -1,4 +1,4 @@
-# FaceSignsDemo
+# FaceSigns Demo
 
 Inference demo for our paper [FaceSigns: Semi-Fragile Neural Watermarks for Media Authentication and Countering Deepfakes
 ](https://arxiv.org/abs/2204.01960)
