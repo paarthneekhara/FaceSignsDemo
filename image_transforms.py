@@ -78,6 +78,7 @@ def apply_malicious_transforms(signed_image_paths, target_image_paths, out_dir):
     
     return ["face_swap"], transformed_image_filepaths
 
+# https://github.com/guipleite/CV2-Face-Swap
 def swap_faces(face_image_path, body_image_path, output_path):
     face = cv2.imread(face_image_path)
     body = cv2.imread(body_image_path)
